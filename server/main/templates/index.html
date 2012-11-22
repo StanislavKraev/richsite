@@ -1,0 +1,17 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Sample page</title>
+</head>
+<body>
+{% if root %}
+    Html sample page.
+{% else %}
+    <a href="/">Html sample page</a>{% block current_page %} &mdash; Page One{% end %}
+{% end %}
+<ul>
+    <li><a href="/page_one/">Page one</a></li>
+    <li><a href="/page_two/">Page two</a></li>
+</ul>
+</body>
+</html>
