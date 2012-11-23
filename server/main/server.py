@@ -25,18 +25,18 @@ class IndexHandler(BaseRequestHandler):
     def get_data(self):
         return {'root' : True}
 
-class PageOneHandler(BaseRequestHandler):
+class ChatPageHandler(BaseRequestHandler):
     def get_template_name(self):
-        return "page_one.html"
+        return "chat.html"
 
-class PageTwoHandler(BaseRequestHandler):
+class NewsPageHandler(BaseRequestHandler):
     def get_template_name(self):
-        return "page_two.html"
+        return "news.html"
 
 application = tornado.web.Application([
     (r"/", IndexHandler),
-    (r"/page_one/", PageOneHandler),
-    (r"/page_two/", PageTwoHandler),
+    (r"/chat/", ChatPageHandler),
+    (r"/news/", NewsPageHandler),
 ], debug=True)
 
 if __name__ == "__main__":

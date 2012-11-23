@@ -3,17 +3,21 @@
 <head>
     <title>Sample page</title>
     <link href="/media/css/base.css" rel="stylesheet" type="text/css" />
+    <script src="/media/js/jquery-1.8.3.min.js"></script>
 </head>
 <body>
 {% if root %}
     Html sample page.
 {% else %}
-    <a href="/">Html sample page</a>{% block current_page %} &mdash; Page One{% end %}
+    <a href="/">Html sample page</a>{% block current_page %}{% end %}
 {% end %}
 <ul>
-    <li><a href="/page_one/">Page one</a></li>
-    <li><a href="/page_two/">Page two</a></li>
+    <li><a href="/chat/">Chat</a></li>
+    <li><a href="/news/">News</a></li>
 </ul>
+<header></header>
+<div id="content"></div>
 <img src="/media/img/www.jpg">
+<script src="/media/js/index.js"></script>
 </body>
 </html>
