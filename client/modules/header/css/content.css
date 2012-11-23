@@ -1,0 +1,12 @@
+#header ul {
+    list-style-type: none;
+}
+
+#header li {
+    color:#dc143c;
+}
+
+#header li:hover {
+    color:#c71585;
+    font-weight: bold;
+}

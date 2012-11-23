@@ -1,0 +1,5 @@
+{
+    "requires" : [],
+    "templates" : ["content"],
+    "css" : ["content"]
+}
