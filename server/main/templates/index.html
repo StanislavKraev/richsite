@@ -1,23 +1,14 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-    <title>Sample page</title>
+    <title>{{page_title}}</title>
     <link href="/media/css/base.css" rel="stylesheet" type="text/css" />
     <script src="/media/js/jquery-1.8.3.min.js"></script>
+    <script src="/media/js/handlebars-1.0.rc.1.js"></script>
+    <script src="/media/js/require-2.1.1.js"></script>
 </head>
 <body>
-{% if root %}
-    Html sample page.
-{% else %}
-    <a href="/">Html sample page</a>{% block current_page %}{% end %}
-{% end %}
-<ul>
-    <li><a href="/chat/">Chat</a></li>
-    <li><a href="/news/">News</a></li>
-</ul>
-<header></header>
-<div id="content"></div>
-<img src="/media/img/www.jpg">
-<script src="/media/js/index.js"></script>
+<header>{{#module "header"}}{{/module}}</header>
+<div id="content">{{#application app_name}}{{/application}}</div>
 </body>
 </html>
