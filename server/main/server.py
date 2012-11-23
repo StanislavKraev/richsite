@@ -30,8 +30,6 @@ def render_module(this, options, module_name):
     return result
 
 def render_application(this, options, app_name):
-    #return [repr(dir(this)), repr(this.context)]
-
     assert app_name
     result = []
     path = os.path.join(APPLICATIONS_DIR, app_name, "content.html")

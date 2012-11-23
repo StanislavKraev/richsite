@@ -6,9 +6,26 @@
     <script src="/media/js/jquery-1.8.3.min.js"></script>
     <script src="/media/js/handlebars-1.0.rc.1.js"></script>
     <script src="/media/js/require-2.1.1.js"></script>
+    <script src="/media/js/underscore.js"></script>
+    <script src="/media/js/backbone.js"></script>
 </head>
 <body>
 <header>{{#module "header"}}{{/module}}</header>
 <div id="content">{{#application app_name}}{{/application}}</div>
+<script>
+    $(function(){
+        var ApplicationRouter=new(Backbone.Router.extend({}));
+        ApplicationRouter.route(/^$/, 'index', function (params) {
+            alert('index');
+        });
+        ApplicationRouter.route(/^chat\/$/, 'chat', function (params) {
+            alert('chat');
+        });
+        ApplicationRouter.route(/^news\/$/, 'news', function (params) {
+            alert('news');
+        });
+        Backbone.history.start({ pushState : true, root : '/' });
+    });
+</script>
 </body>
 </html>
