@@ -15,6 +15,7 @@
 
 TODOs
 1. build system
+
 2. extract router from backbone
 3. integrate json with startup data on first generate
 4. instantiate and attach js objects after page load
