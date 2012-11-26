@@ -5,26 +5,37 @@
     <link href="/media/css/base.css" rel="stylesheet" type="text/css" />
     <script src="/media/js/jquery-1.8.3.min.js"></script>
     <script src="/media/js/handlebars-1.0.rc.1.js"></script>
-    <script src="/media/js/require-2.1.1.js"></script>
+    <script src="/media/js/yui.js"></script>
     <script src="/media/js/underscore.js"></script>
     <script src="/media/js/backbone.js"></script>
+    <script src="/media/js/base.js"></script>
 </head>
 <body>
 <header>{{#module "header"}}{{/module}}</header>
 <div id="content">{{#application app_name}}{{/application}}</div>
+<script src="/media/js/header_stub.js"></script>
 <script>
+    var router;
     $(function(){
-        var ApplicationRouter=new(Backbone.Router.extend({}));
+        var ApplicationRouter = new(Backbone.Router.extend({}));
+
+        function loadModule(moduleName) {
+            YUI().use(moduleName, function (Y, result) {
+
+            });
+        }
+
+        router = ApplicationRouter;
         ApplicationRouter.route(/^$/, 'index', function (params) {
-            alert('index');
+            loadModule("index");
         });
         ApplicationRouter.route(/^chat\/$/, 'chat', function (params) {
-            alert('chat');
+            loadModule("chat");
         });
         ApplicationRouter.route(/^news\/$/, 'news', function (params) {
-            alert('news');
+            loadModule("news");
         });
-        Backbone.history.start({ pushState : true, root : '/' });
+        Backbone.history.start({ pushState : true, root : '/', silent: true });
     });
 </script>
 </body>

@@ -2,6 +2,7 @@
 import codecs
 import os
 from pybars import Compiler
+import simplejson
 
 compiler = Compiler()
 
@@ -13,6 +14,7 @@ CLIENT_DIR = os.path.join(APP_DIR, '../../client')
 MODULES_DIR = os.path.join(CLIENT_DIR, "modules")
 TEMPLATES_DIR = os.path.join(APP_DIR, "templates")
 APPLICATIONS_DIR = os.path.join(CLIENT_DIR, "apps")
+COMBO_LOADER_ROOT = os.path.join(CLIENT_DIR, "media", "js", "prebuilt_modules")
 
 #from pydev import pydevd
 #pydevd.settrace('localhost', port=33321, stdoutToServer=True, stderrToServer=True, suspend=False)
@@ -38,7 +40,8 @@ def render_application(this, options, app_name):
         template = compiler.compile(template_src)
         rendered = unicode(template(this.context, helpers=HELPERS))
         result.append(rendered)
-        # todo: automatically add merged css, js
+        result.append('<script src="/media/js/prebuilt_apps/%s.js"></script>' % app_name)
+        # todo: automatically add merged css, js links
     return result
 
 HELPERS = helpers={u'module': render_module,
@@ -46,7 +49,17 @@ HELPERS = helpers={u'module': render_module,
 
 class BaseRequestHandler(tornado.web.RequestHandler):
     def get(self):
+        try:
+            self.get_argument('json')
+            json = True
+        except Exception:
+            json = False
+
         data = self.get_data()
+        if json:
+            self.content_type = "application/x-javascript"
+            self.write(simplejson.dumps(data))
+            self.finish()
 
         with codecs.open(os.path.join(TEMPLATES_DIR, self.get_template_name()), encoding="utf-8") as file:
             template_src = file.read()
@@ -64,7 +77,8 @@ class BaseRequestHandler(tornado.web.RequestHandler):
 class IndexHandler(BaseRequestHandler):
     def get_data(self): # defaults
         data = super(IndexHandler, self).get_data()
-        data.update({'app_name' : "index"})
+        data.update({'app_name' : "index",
+                     'username' : 'skraev'})
         return data
 
 class ChatPageHandler(BaseRequestHandler):
@@ -93,10 +107,58 @@ class NewsPageHandler(BaseRequestHandler):
                      'page_title' : 'News'})
         return data
 
+class ComboLoaderHandler(tornado.web.RequestHandler):
+    ROOT = COMBO_LOADER_ROOT
+
+    def get(self, *args, **kwargs):
+        cur_locale = 'ru'
+
+        file_list = self.request.query.split('&')
+        if not len(file_list):
+            self.finish()
+            return
+
+        type = None
+        content_list = []
+        for file_name in file_list:
+            base, ext = os.path.splitext(file_name)
+            if ext == '.js':
+                newType = 'js'
+            elif ext == '.css':
+                newType = 'css'
+            else:
+                self.write_error(400, "Unknown file type requested: %s" % ext)
+                return
+
+            if not type:
+                type = newType
+            elif type != newType:
+                self.write_error(400, "Only same file format types are allowed")
+                return
+
+            path = os.path.join(self.ROOT, file_name)
+            with codecs.open(path, 'r', 'utf-8') as file:
+                content_list.append(file.read())
+
+        mimetypes = {'css' : 'text/css',
+                     'js' : 'application/x-javascript'}
+
+        mimetype = mimetypes.get(type)
+        if not mimetype:
+            self.write_error(400, "Unknown file type requested.")
+            return
+
+        content = '\n'.join(content_list)
+        self.content_type = mimetype
+        self.write(content)
+        self.finish()
+
 application = tornado.web.Application([
     (r"/", IndexHandler),
+    (r"/index/", IndexHandler),
     (r"/chat/", ChatPageHandler),
     (r"/news/", NewsPageHandler),
+    (r"/combo/", ComboLoaderHandler),
 ], debug=True)
 
 if __name__ == "__main__":
