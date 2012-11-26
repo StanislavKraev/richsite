@@ -26,10 +26,29 @@ def render_module(this, options, module_name):
     with codecs.open(path, encoding="utf-8") as file:
         template_src = file.read()
         template = compiler.compile(template_src)
-        rendered = unicode(template(this.context, helpers=HELPERS))
+        this.context['_current_module_name'] = module_name
+        rendered = unicode(template(this.context, helpers=HELPERS, partials=PARTIALS))
         result.append(rendered)
     # todo: automatically add merged css, js
     return result
+
+#def render_module_template(this, options, template_name):
+#    assert template_name
+#    module_name = this.context['_current_module_name']
+#    ctx = this.context
+#    while not module_name:
+#        ctx = ctx.parent
+#        module_name = ctx['_current_module_name']
+#    print("module_name: %s" % module_name)
+#    result = []
+#    path = os.path.join(MODULES_DIR, module_name, "templates", "%s.html" % template_name)
+#    with codecs.open(path, encoding="utf-8") as file:
+#        template_src = file.read()
+#        template = compiler.compile(template_src)
+#        rendered = unicode(template(this.context, helpers=HELPERS, partials=PARTIALS))
+#        result.append(rendered)
+#        # todo: automatically add merged css, js
+#    return result
 
 def render_application(this, options, app_name):
     assert app_name
@@ -38,7 +57,8 @@ def render_application(this, options, app_name):
     with codecs.open(path, encoding="utf-8") as file:
         template_src = file.read()
         template = compiler.compile(template_src)
-        rendered = unicode(template(this.context, helpers=HELPERS))
+        this.context['_current_app_name'] = app_name
+        rendered = unicode(template(this.context, helpers=HELPERS, partials=PARTIALS))
         result.append(rendered)
         result.append('<script src="/media/js/prebuilt_apps/%s.js"></script>' % app_name)
         # todo: automatically add merged css, js links
@@ -46,6 +66,19 @@ def render_application(this, options, app_name):
 
 HELPERS = helpers={u'module': render_module,
                    u'application' : render_application}
+
+def get_partial(partial_name):
+    module_name = "chat"
+    path = os.path.join(MODULES_DIR, module_name, "templates", "%s.html" % "message")
+    with codecs.open(path, encoding="utf-8") as file:
+        template_src = file.read()
+        template = compiler.compile(template_src)
+    print("loaded partials: %s" % template_src)
+    return template
+
+PARTIALS = {
+    u'chat_message' : get_partial("chat_message")
+}
 
 class BaseRequestHandler(tornado.web.RequestHandler):
     def get(self):
@@ -64,7 +97,7 @@ class BaseRequestHandler(tornado.web.RequestHandler):
         with codecs.open(os.path.join(TEMPLATES_DIR, self.get_template_name()), encoding="utf-8") as file:
             template_src = file.read()
             template = compiler.compile(template_src)
-            result = unicode(template(data, helpers=HELPERS))
+            result = unicode(template(data, helpers=HELPERS, partials=PARTIALS))
         self.write(result)
 
     def get_data(self): # defaults
